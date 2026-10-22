@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080d13">
+  <meta name="description" content="Visualize sua vida em 4.160 semanas. Um calendário interativo para refletir sobre o tempo, inspirado em Tim Urban.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="The Tail End — Sua vida em semanas">
+  <meta property="og:description" content="80 anos. 4.160 semanas. Um quadradinho de cada vez.">
+  <title>The Tail End — Sua vida em semanas</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="#inicio" aria-label="The Tail End — início">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-copy"><strong>THE TAIL END</strong><small>SEU TEMPO EM PERSPECTIVA</small></span>
+      </a>
+      <nav class="header-nav" aria-label="Navegação principal">
+        <a href="#calendario">Calendário</a>
+        <a href="#indicadores">Indicadores</a>
+        <a href="#sobre">Sobre</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section id="inicio" class="intro shell">
+      <div class="intro-main">
+        <p class="eyebrow"><span class="dot"></span> UMA NOVA PERSPECTIVA SOBRE O TEMPO</p>
+        <h1>Sua vida.<br><span>Uma semana por vez.</span></h1>
+        <p class="intro-description">A vida parece longa quando pensamos em anos. Mas quando cada semana cabe em um pequeno quadrado, o tempo ganha outra dimensão.</p>
+        <a class="intro-link" href="#calendario">Explore seu calendário <span aria-hidden="true">↘</span></a>
+      </div>
+      <div class="intro-aside" aria-label="Escala do calendário">
+        <span class="aside-kicker">UMA VIDA EM NÚMEROS</span>
+        <span class="aside-number">4.160<span class="aside-point">.</span></span>
+        <span class="aside-caption">semanas distribuídas<br>em 80 anos</span>
+        <span class="aside-footnote">80 × 52 = 4.160</span>
+      </div>
+    </section>
+
+    <section id="calendario" class="shell calendar-section" aria-labelledby="calendar-title">
+      <div class="section-head">
+        <div><p class="eyebrow">01 / SEU CALENDÁRIO</p><h2 id="calendar-title">O mapa da sua vida</h2></div>
+        <p class="section-note">Um quadradinho representa uma semana.<br>Uma linha representa um ano.</p>
+      </div>
+
+      <form class="birth-form" id="birth-form">
+        <div class="birth-copy">
+          <label for="birthdate">Qual é a sua data de nascimento?</label>
+          <p>Preencha para iluminar as semanas que você já viveu.</p>
+        </div>
+        <div class="birth-actions">
+          <input id="birthdate" name="birthdate" type="date" autocomplete="bday" aria-describedby="birth-help" required>
+          <button id="reset-demo" type="button" class="subtle-button">Ver exemplo</button>
+        </div>
+        <p id="birth-help" class="form-footnote">Sua data fica somente neste navegador. Não há cadastro nem envio para servidores.</p>
+      </form>
+      <div class="cal-status" aria-live="polite">
+        <span class="status-pill" id="view-status"><span class="status-light"></span> EXEMPLO ILUSTRATIVO</span>
+        <span id="age-label">Visualização de uma pessoa de 30 anos</span>
+      </div>
+
+      <div class="calendar-card">
+        <div class="calendar-top">
+          <div>
+            <p class="calendar-eyebrow">SEMANAS DE UMA VIDA</p>
+            <h3><span id="weeks-completed-title">1.560</span> <span>de 4.160 semanas</span></h3>
+          </div>
+          <div class="calendar-percentage" id="percentage-label">37,5%</div>
+        </div>
+        <div class="progress-track" role="progressbar" id="life-progress" aria-label="Porcentagem do período de 80 anos já transcorrida" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37.5">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <div class="calendar-legend" aria-label="Legenda do calendário">
+          <span><i class="legend-cell legend-lived"></i> Semana vivida</span>
+          <span><i class="legend-cell legend-now"></i> Semana atual</span>
+          <span><i class="legend-cell legend-future"></i> Semana futura</span>
+        </div>
+        <div class="grid-axis-top"><span>IDADE</span><span>52 SEMANAS POR ANO <span aria-hidden="true">→</span></span></div>
+        <div id="life-calendar" class="life-calendar" role="img" aria-label="Calendário de 80 anos com 52 quadrados por linha, indicando semanas vividas, atual e futuras."></div>
+        <div class="grid-axis-bottom"><span>0 ANOS</span><span>40 ANOS</span><span>80 ANOS</span></div>
+        <p class="calendar-caption">Cada linha começa em um aniversário. Para manter 52 quadrados por ano, as semanas são uma representação proporcional do respectivo ano de vida.</p>
+      </div>
+    </section>
+
+    <section id="indicadores" class="shell indicators-section" aria-labelledby="indicators-title">
+      <div class="section-head">
+        <div><p class="eyebrow">02 / OS NÚMEROS</p><h2 id="indicators-title">O tempo em perspectiva</h2></div>
+        <p class="section-note">Uma leitura do caminho percorrido<br>e do horizonte escolhido.</p>
+      </div>
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <div class="metric-card-top"><span>01 / TOTAL</span><span class="metric-icon" aria-hidden="true">▦</span></div>
+          <strong id="stat-total" class="metric-value">4.160</strong><p class="metric-label">semanas no calendário</p>
+          <small>80 anos × 52 semanas</small>
+        </article>
+        <article class="metric-card metric-card-green">
+          <div class="metric-card-top"><span>02 / PERCORRIDAS</span><span class="metric-icon" aria-hidden="true">◩</span></div>
+          <strong id="stat-lived" class="metric-value">1.560</strong><p class="metric-label">semanas concluídas</p>
+          <small>A semana atual não está concluída</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-card-top"><span>03 / PELA FRENTE</span><span class="metric-icon" aria-hidden="true">◫</span></div>
+          <strong id="stat-left" class="metric-value">2.600</strong><p class="metric-label">semanas não concluídas</p>
+          <small>Inclui a semana atual, quando aplicável</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-card-top"><span>04 / PROGRESSO</span><span class="metric-icon" aria-hidden="true">◷</span></div>
+          <strong id="stat-age" class="metric-value">30</strong><p class="metric-label">anos completos</p>
+          <small id="stat-age-detail">de uma referência de 80 anos</small>
+        </article>
+      </div>
+
+      <div class="time-spent-head">
+        <div><h3>Para onde vão nossas semanas?</h3><p>Estimativas em semanas equivalentes, considerando apenas o tempo já vivido.</p></div>
+        <span class="estimate-label">SIMULAÇÕES AJUSTÁVEIS</span>
+      </div>
+      <div class="allocation-grid">
+        <article class="allocation-card allocation-sleep">
+          <div class="allocation-header"><span class="allocation-icon" aria-hidden="true">☾</span><span>DESCANSO</span></div>
+          <strong id="stat-sleep" class="allocation-number">520 <em>semanas</em></strong>
+          <p>Tempo estimado dormindo desde o nascimento.</p>
+          <div class="slider-wrap">
+            <label for="sleep-hours">Horas de sono por dia <output id="sleep-hours-value" for="sleep-hours">8 h</output></label>
+            <input type="range" id="sleep-hours" min="4" max="12" step="0.5" value="8">
+          </div>
+        </article>
+        <article class="allocation-card allocation-work">
+          <div class="allocation-header"><span class="allocation-icon" aria-hidden="true">⌁</span><span>TRABALHO</span></div>
+          <strong id="stat-work" class="allocation-number">149 <em>semanas</em></strong>
+          <p>Tempo estimado de trabalho remunerado no período configurado.</p>
+          <div class="slider-wrap">
+            <label for="work-hours">Horas de trabalho por semana <output id="work-hours-value" for="work-hours">40 h</output></label>
+            <input type="range" id="work-hours" min="0" max="70" step="5" value="40">
+          </div>
+          <div class="age-range">
+            <label for="work-start">Idade inicial <select id="work-start"><option value="16">16 anos</option><option value="18" selected>18 anos</option><option value="20">20 anos</option><option value="22">22 anos</option><option value="25">25 anos</option></select></label>
+            <label for="work-end">Idade final <select id="work-end"><option value="55">55 anos</option><option value="60">60 anos</option><option value="65" selected>65 anos</option><option value="70">70 anos</option><option value="75">75 anos</option></select></label>
+          </div>
+        </article>
+      </div>
+      <p class="estimate-note">As estimativas não representam registros reais: sono é calculado pelas horas diárias e trabalho pela jornada semanal no intervalo de idades selecionado, sem desconto de férias, feriados ou interrupções. As duas categorias não são uma divisão exaustiva do tempo. Você pode modificar as hipóteses.</p>
+    </section>
+
+    <section class="reflection shell" aria-labelledby="reflection-title">
+      <div class="reflection-line"></div>
+      <p class="eyebrow">UM LEMBRETE, NÃO UMA CONTAGEM REGRESSIVA</p>
+      <h2 id="reflection-title">O valor do tempo não está em quantas semanas temos.<br><span>Está no que fazemos com elas.</span></h2>
+      <p>80 anos é somente uma referência visual, não uma previsão de longevidade. O calendário serve para provocar reflexão, não para determinar o futuro.</p>
+    </section>
+
+    <section id="sobre" class="about-section">
+      <div class="shell about-layout">
+        <div class="about-heading"><p class="eyebrow">03 / SOBRE O PROJETO</p><h2>De onde veio<br><span>essa ideia?</span></h2><div class="about-mini-grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        <div class="about-body">
+          <p>Em 2014, o escritor e ilustrador <strong>Tim Urban</strong>, criador do blog <i>Wait But Why</i>, publicou <i>Your Life in Weeks</i>: uma representação de 90 anos de vida em pequenos quadrados, um por semana. Era uma forma simples de tornar visível algo que normalmente parece abstrato — o tempo.</p>
+          <p>No ano seguinte, em <i>The Tail End</i> (2015), Urban levou a ideia adiante. Em vez de pensar apenas no tempo de vida, examinou quantas oportunidades ainda temos de compartilhar momentos com as pessoas que amamos. A conclusão não era viver com pressa, mas escolher conscientemente nossas prioridades e valorizar o tempo de qualidade.</p>
+          <p>Esta ferramenta é uma <strong>adaptação independente</strong>, inspirada nos dois textos, com horizonte ilustrativo de 80 anos e cálculo individual a partir da data de nascimento. Não é um projeto oficial nem afiliado a Tim Urban ou ao <i>Wait But Why</i>.</p>
+          <div class="source-links">
+            <a href="https://waitbutwhy.com/2014/05/life-weeks.html" target="_blank" rel="noopener noreferrer">Your Life in Weeks (2014) <span aria-hidden="true">↗</span></a>
+            <a href="https://waitbutwhy.com/2015/12/the-tail-end.html" target="_blank" rel="noopener noreferrer">The Tail End (2015) <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="shell footer-inner"><div class="footer-brand">THE TAIL END <span>·</span> UMA SEMANA POR VEZ</div><p>O tempo é finito. As possibilidades, não.</p><a href="https://github.com/marcianolima/the-tail-end" target="_blank" rel="noopener noreferrer">Código no GitHub ↗</a></div></footer>
+</body>
+</html>
