@@ -336,22 +336,26 @@
     if (workShare > 0 && yearsWorked > 0 && yearRows[state.workStart]) {
       const firstRow = yearRows[state.workStart].getBoundingClientRect();
       const yTop = firstRow.top - offsetY;
-      const points = [[workLeft, yTop], [workRight, yTop]];
+      const points = [[workLeft, yTop]];
 
       if (fullYears > 0) {
         const lastFullRow = yearRows[state.workStart + fullYears - 1].getBoundingClientRect();
         const lastFullY = lastFullRow.bottom - offsetY;
-        points.push([workRight, lastFullY]);
-      }
+        points.push([workRight, yTop], [workRight, lastFullY]);
 
-      if (partial > 0.00001 && yearRows[state.workStart + fullYears]) {
-        const partialRow = yearRows[state.workStart + fullYears].getBoundingClientRect();
+        if (partial > 0.00001 && yearRows[state.workStart + fullYears]) {
+          const partialRow = yearRows[state.workStart + fullYears].getBoundingClientRect();
+          const partialX = workLeft + (workRight - workLeft) * partial;
+          const partialBottomY = partialRow.bottom - offsetY;
+          points.push([partialX, lastFullY], [partialX, partialBottomY], [workLeft, partialBottomY]);
+        } else {
+          points.push([workLeft, lastFullY]);
+        }
+      } else if (partial > 0.00001) {
+        const partialRow = yearRows[state.workStart].getBoundingClientRect();
         const partialX = workLeft + (workRight - workLeft) * partial;
         const partialBottomY = partialRow.bottom - offsetY;
-        points.push([partialX, partialBottomY], [workLeft, partialBottomY]);
-      } else {
-        const endRow = yearRows[state.workStart + Math.max(0, fullYears - 1)].getBoundingClientRect();
-        points.push([workLeft, endRow.bottom - offsetY]);
+        points.push([partialX, yTop], [partialX, partialBottomY], [workLeft, partialBottomY]);
       }
 
       const path = points.map((point, index) =>
