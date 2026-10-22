@@ -23,6 +23,17 @@
     reset: document.getElementById("reset-demo"),
     help: document.getElementById("birth-help"),
     grid: document.getElementById("life-calendar"),
+    calendarVisual: document.getElementById("calendar-visual"),
+    overlays: document.getElementById("time-overlays"),
+    weekDetails: document.getElementById("week-details"),
+    weekClose: document.getElementById("week-details-close"),
+    weekStatus: document.getElementById("week-details-status"),
+    weekNumber: document.getElementById("week-details-number"),
+    weekAge: document.getElementById("week-details-age"),
+    weekDate: document.getElementById("week-details-date"),
+    weekPosition: document.getElementById("week-details-position"),
+    sleepCard: document.getElementById("sleep-card"),
+    workCard: document.getElementById("work-card"),
     status: document.getElementById("view-status"),
     ageLabel: document.getElementById("age-label"),
     headline: document.getElementById("weeks-completed-title"),
@@ -45,8 +56,15 @@
   };
 
   const cells = [];
+  const yearRows = [];
   let lastCompleted = -1;
   let lastCurrent = -2;
+  let selectedIndex = -1;
+  let keyboardIndex = 0;
+  let activeBirth = null;
+  let activeTimeline = null;
+  let overlayScheduled = false;
+  const weekDateFormatter = new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" });
   let state = {
     birth: "",
     sleepHours: 8,
@@ -146,12 +164,17 @@
 
       const weeks = document.createElement("div");
       weeks.className = "year-weeks";
-      weeks.setAttribute("aria-hidden", "true");
 
-      for (let index = 0; index < WEEKS_PER_YEAR; index += 1) {
-        const cell = document.createElement("span");
+      for (let week = 0; week < WEEKS_PER_YEAR; week += 1) {
+        const index = year * WEEKS_PER_YEAR + week;
+        const cell = document.createElement("button");
+        cell.type = "button";
         cell.className = "week future";
-        cell.title = "Idade " + year + " · semana " + (index + 1) + " de 52";
+        cell.tabIndex = -1;
+        cell.dataset.index = String(index);
+        cell.title = "Semana " + (index + 1) + " · " + year + " anos · " + (week + 1) + "/52";
+        cell.setAttribute("aria-label", "Semana " + (index + 1) + ", idade " + year + " anos, semana " + (week + 1) + " de 52");
+        cell.setAttribute("aria-pressed", "false");
         weeks.appendChild(cell);
         cells.push(cell);
       }
@@ -159,6 +182,7 @@
       row.appendChild(tick);
       row.appendChild(weeks);
       fragment.appendChild(row);
+      yearRows.push(weeks);
     }
     refs.grid.appendChild(fragment);
   }
@@ -167,11 +191,18 @@
     if (timeline.completed !== lastCompleted || timeline.currentIndex !== lastCurrent) {
       for (let index = 0; index < TOTAL; index += 1) {
         const type = index < timeline.completed ? "elapsed" : index === timeline.currentIndex ? "current" : "future";
-        const className = "week " + type;
+        const className = "week " + type + (index === selectedIndex ? " selected" : "");
         if (cells[index].className !== className) cells[index].className = className;
       }
       lastCompleted = timeline.completed;
       lastCurrent = timeline.currentIndex;
+    }
+
+    const suggested = timeline.currentIndex < 0 ? TOTAL - 1 : timeline.currentIndex;
+    if (selectedIndex < 0 && cells[keyboardIndex]) {
+      cells[keyboardIndex].tabIndex = -1;
+      keyboardIndex = suggested;
+      cells[keyboardIndex].tabIndex = 0;
     }
 
     const descriptor = personal ? "Seu calendário" : "Calendário ilustrativo de 30 anos";
@@ -179,8 +210,168 @@
       "aria-label",
       descriptor + ": " + TOTAL + " semanas em 80 anos, " + timeline.completed +
       " concluídas, " + timeline.remaining + " ainda não concluídas." +
+      " Toque para consultar ou use as setas do teclado." +
       (timeline.currentIndex >= 0 ? " Semana atual destacada." : "")
     );
+  }
+
+  function weekStartStamp(birth, index) {
+    const year = Math.floor(index / WEEKS_PER_YEAR);
+    const weekOfYear = index % WEEKS_PER_YEAR;
+    const begin = anniversary(birth, year);
+    const end = anniversary(birth, year + 1);
+    return begin + Math.round((end - begin) * weekOfYear / WEEKS_PER_YEAR / 86400000) * 86400000;
+  }
+
+  function ageInMonthsAt(birth, year, stamp) {
+    const start = new Date(anniversary(birth, year));
+    const target = new Date(stamp);
+    let monthCount = (target.getUTCFullYear() - start.getUTCFullYear()) * 12
+      + target.getUTCMonth() - start.getUTCMonth();
+    if (target.getUTCDate() < start.getUTCDate()) monthCount--;
+    return clamp(monthCount, 0, 11);
+  }
+
+  function hideWeekDetails() {
+    if (selectedIndex >= 0 && cells[selectedIndex]) {
+      cells[selectedIndex].classList.remove("selected");
+      cells[selectedIndex].setAttribute("aria-pressed", "false");
+    }
+    selectedIndex = -1;
+    refs.weekDetails.hidden = true;
+  }
+
+  function placeWeekDetails(cell) {
+    if (refs.weekDetails.hidden || !cell) return;
+    const rect = cell.getBoundingClientRect();
+    const popup = refs.weekDetails.getBoundingClientRect();
+    const width = popup.width || 296;
+    const height = popup.height || 170;
+    const left = clamp(rect.left + rect.width / 2 - width / 2, 12, Math.max(12, window.innerWidth - width - 12));
+    let top = rect.bottom + 12;
+    if (top + height > window.innerHeight - 12) top = rect.top - height - 12;
+    if (top < 12) top = Math.max(12, (window.innerHeight - height) / 2);
+    refs.weekDetails.style.left = left.toFixed(1) + "px";
+    refs.weekDetails.style.top = top.toFixed(1) + "px";
+  }
+
+  function selectWeek(index, focus) {
+    if (!activeBirth || !activeTimeline || !cells[index]) return;
+    const previous = selectedIndex;
+    if (previous >= 0 && previous !== index) {
+      cells[previous].classList.remove("selected");
+      cells[previous].setAttribute("aria-pressed", "false");
+    }
+    selectedIndex = index;
+    cells[index].classList.add("selected");
+    cells[index].setAttribute("aria-pressed", "true");
+    if (keyboardIndex !== index) {
+      cells[keyboardIndex].tabIndex = -1;
+      keyboardIndex = index;
+      cells[index].tabIndex = 0;
+    }
+
+    const year = Math.floor(index / WEEKS_PER_YEAR);
+    const weekOfYear = index % WEEKS_PER_YEAR;
+    const begin = weekStartStamp(activeBirth, index);
+    const end = index === TOTAL - 1
+      ? anniversary(activeBirth, YEARS)
+      : weekStartStamp(activeBirth, index + 1);
+    const month = ageInMonthsAt(activeBirth, year, begin);
+    const period = index < activeTimeline.completed ? "elapsed" :
+      index === activeTimeline.currentIndex ? "current" : "future";
+
+    refs.weekDetails.dataset.period = period;
+    refs.weekStatus.textContent = period === "elapsed" ? "SEMANA VIVIDA" :
+      period === "current" ? "SEMANA ATUAL" : "SEMANA FUTURA";
+    refs.weekNumber.textContent = "Semana " + formatter.format(index + 1);
+    refs.weekAge.textContent = year + (year === 1 ? " ano" : " anos") +
+      " e " + month + (month === 1 ? " mês" : " meses");
+    refs.weekDate.textContent = "Período aproximado: " +
+      weekDateFormatter.format(new Date(begin)) + " – " +
+      weekDateFormatter.format(new Date(end - 86400000));
+    refs.weekPosition.textContent = "Semana " + (weekOfYear + 1) +
+      " de 52 no ano de vida " + (year + 1) +
+      (state.birth ? "" : " · exemplo ilustrativo");
+    refs.weekDetails.hidden = false;
+    if (focus) cells[index].focus();
+    placeWeekDetails(cells[index]);
+  }
+
+  function renderOverlays() {
+    if (!activeTimeline || !refs.overlays || !cells.length) return;
+
+    const visualBounds = refs.calendarVisual.getBoundingClientRect();
+    const first = cells[0].getBoundingClientRect();
+    const last = cells[TOTAL - 1].getBoundingClientRect();
+    if (!visualBounds.width || !first.width || !last.width) return;
+
+    const offsetX = visualBounds.left;
+    const offsetY = visualBounds.top;
+    const x0 = first.left - offsetX;
+    const x1 = last.right - offsetX;
+    const top = first.top - offsetY;
+    const bottom = last.bottom - offsetY;
+    const availableWidth = x1 - x0;
+    const sleepRatio = clamp(state.sleepHours / 24, 0, 1);
+    const dividerX = x1 - availableWidth * sleepRatio;
+    const dimension = (value) => Number(value.toFixed(2));
+    const markup = [];
+    const height = Math.max(0, bottom - top);
+
+    markup.push('<rect class="sleep-band" x="' + dimension(dividerX) + '" y="' +
+      dimension(top) + '" width="' + dimension(Math.max(0, x1 - dividerX)) +
+      '" height="' + dimension(height) + '"/>');
+    markup.push('<line class="sleep-divider" x1="' + dimension(dividerX) + '" y1="' +
+      dimension(top) + '" x2="' + dimension(dividerX) + '" y2="' + dimension(bottom) + '"/>');
+
+    const workShare = clamp(state.workHours / 168, 0, 1);
+    const yearsWorked = clamp(activeTimeline.livedYears - state.workStart,
+      0, Math.max(0, state.workEnd - state.workStart));
+    const fullYears = Math.floor(yearsWorked + 1e-8);
+    const partial = clamp(yearsWorked - fullYears, 0, 1);
+    const workLeft = dividerX - availableWidth * workShare;
+    const workRight = dividerX;
+
+    if (workShare > 0 && yearsWorked > 0 && yearRows[state.workStart]) {
+      const firstRow = yearRows[state.workStart].getBoundingClientRect();
+      const yTop = firstRow.top - offsetY;
+      const points = [[workLeft, yTop], [workRight, yTop]];
+
+      if (fullYears > 0) {
+        const lastFullRow = yearRows[state.workStart + fullYears - 1].getBoundingClientRect();
+        const lastFullY = lastFullRow.bottom - offsetY;
+        points.push([workRight, lastFullY]);
+      }
+
+      if (partial > 0.00001 && yearRows[state.workStart + fullYears]) {
+        const partialRow = yearRows[state.workStart + fullYears].getBoundingClientRect();
+        const partialX = workLeft + (workRight - workLeft) * partial;
+        const partialBottomY = partialRow.bottom - offsetY;
+        points.push([partialX, partialBottomY], [workLeft, partialBottomY]);
+      } else {
+        const endRow = yearRows[state.workStart + Math.max(0, fullYears - 1)].getBoundingClientRect();
+        points.push([workLeft, endRow.bottom - offsetY]);
+      }
+
+      const path = points.map((point, index) =>
+        (index === 0 ? "M " : " L ") + dimension(point[0]) + " " + dimension(point[1])
+      ).join("") + " Z";
+      markup.push('<path class="work-region" d="' + path + '"/>');
+    }
+
+    refs.overlays.setAttribute("viewBox", "0 0 " +
+      dimension(visualBounds.width) + " " + dimension(visualBounds.height));
+    refs.overlays.innerHTML = markup.join("");
+  }
+
+  function scheduleOverlayRender() {
+    if (overlayScheduled) return;
+    overlayScheduled = true;
+    window.requestAnimationFrame(function () {
+      overlayScheduled = false;
+      renderOverlays();
+    });
   }
 
   function settingsFromControls() {
@@ -228,6 +419,8 @@
     const personal = Boolean(parsed);
     const birth = parsed || demoBirth(today);
     const timeline = derive(birth, today);
+    activeBirth = birth;
+    activeTimeline = timeline;
 
     updateCalendar(timeline, personal);
 
@@ -262,6 +455,7 @@
     refs.sleep.innerHTML = formatter.format(Math.round(sleepEquivalent)) + " <em>semanas</em>";
     refs.work.innerHTML = formatter.format(Math.round(workEquivalent)) + " <em>semanas</em>";
     syncControls();
+    scheduleOverlayRender();
   }
 
   function setBirthFromInput() {
@@ -280,6 +474,7 @@
     }
     refs.birth.setCustomValidity("");
     state.birth = value;
+    hideWeekDetails();
     persist();
     display();
   }
@@ -306,6 +501,7 @@
       state.birth = "";
       refs.birth.value = "";
       refs.birth.setCustomValidity("");
+      hideWeekDetails();
       persist();
       display();
     });
@@ -320,6 +516,72 @@
         settingsFromControls();
         persist();
         display();
+      });
+    });
+
+    // Event delegation keeps 4,160 cells lightweight.
+    refs.grid.addEventListener("click", function (event) {
+      const cell = event.target.closest(".week");
+      if (!cell || !refs.grid.contains(cell)) return;
+      selectWeek(Number(cell.dataset.index), false);
+      event.stopPropagation();
+    });
+    refs.grid.addEventListener("keydown", function (event) {
+      const cell = event.target.closest(".week");
+      if (!cell) return;
+      const index = Number(cell.dataset.index);
+      let next = index;
+      if (event.key === "ArrowRight") next++;
+      else if (event.key === "ArrowLeft") next--;
+      else if (event.key === "ArrowDown") next += WEEKS_PER_YEAR;
+      else if (event.key === "ArrowUp") next -= WEEKS_PER_YEAR;
+      else if (event.key === "Home") next = Math.floor(index / WEEKS_PER_YEAR) * WEEKS_PER_YEAR;
+      else if (event.key === "End") next = Math.floor(index / WEEKS_PER_YEAR) * WEEKS_PER_YEAR + WEEKS_PER_YEAR - 1;
+      else if (event.key === "Escape") {
+        hideWeekDetails();
+        return;
+      } else return;
+      event.preventDefault();
+      selectWeek(clamp(next, 0, TOTAL - 1), true);
+    });
+    refs.weekClose.addEventListener("click", function () {
+      hideWeekDetails();
+      if (cells[keyboardIndex]) cells[keyboardIndex].focus({ preventScroll: true });
+    });
+    document.addEventListener("pointerdown", function (event) {
+      if (!refs.weekDetails.hidden && !refs.weekDetails.contains(event.target) &&
+          !refs.grid.contains(event.target)) hideWeekDetails();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") hideWeekDetails();
+    });
+    window.addEventListener("scroll", function () {
+      if (!refs.weekDetails.hidden) hideWeekDetails();
+    }, { passive: true });
+    window.addEventListener("resize", function () {
+      scheduleOverlayRender();
+      if (!refs.weekDetails.hidden) placeWeekDetails(cells[selectedIndex]);
+    }, { passive: true });
+    if ("ResizeObserver" in window) {
+      const observer = new ResizeObserver(scheduleOverlayRender);
+      observer.observe(refs.calendarVisual);
+    }
+
+    [
+      [refs.sleepCard, "highlight-sleep"],
+      [refs.workCard, "highlight-work"]
+    ].forEach(function (entry) {
+      const card = entry[0];
+      const className = entry[1];
+      function toggle(active) {
+        refs.overlays.classList.toggle(className, active);
+        card.classList.toggle("is-linked", active);
+      }
+      card.addEventListener("pointerenter", function () { toggle(true); });
+      card.addEventListener("pointerleave", function () { toggle(false); });
+      card.addEventListener("focusin", function () { toggle(true); });
+      card.addEventListener("focusout", function (event) {
+        if (!card.contains(event.relatedTarget)) toggle(false);
       });
     });
 
