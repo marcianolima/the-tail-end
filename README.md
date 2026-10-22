@@ -13,6 +13,10 @@ Depois que o GitHub Pages estiver ativado, a URL esperada é:
 ## Funcionalidades
 
 - Calendário de 80 linhas × 52 quadrados em tema escuro, com verde-neon para semanas vividas e destaque da semana atual.
+- **Inspeção interativa:** tocar ou clicar em qualquer quadradinho mostra a semana de vida, idade em anos e meses, datas aproximadas e condição (vivida, atual ou futura). A navegação por teclado usa setas, Home/End e Escape.
+- **Faixa de sono:** área azul translúcida à direita, separada por linha vertical tracejada que atravessa o calendário; sua largura aumenta ou diminui junto do controle de horas de sono.
+- **Polígono de trabalho:** contorno âmbar delimitando uma faixa proporcional às horas de trabalho dentro dos anos de trabalho já transcorridos, considerando os limites etários configurados. O último ano de trabalho é proporcional à fração vivida.
+- A legenda explica as duas novas sobreposições; passar o cursor ou focar os controles dos cards destaca a respectiva faixa.
 - Entrada de **dia, mês e ano de nascimento**, com cálculo pela data local atual.
 - Indicadores: semanas totais, concluídas, ainda não concluídas, idade e progresso percentual.
 - Estimativas em **semanas equivalentes** já gastas dormindo e trabalhando.
@@ -42,6 +46,8 @@ Se a pessoa já completou 80 anos, todo o calendário fica preenchido e as seman
 - Trabalho: anos transcorridos dentro do intervalo de idade selecionado × 52 × (horas de trabalho por semana / 168).
 
 Os números são **semanas equivalentes**, não semanas inteiras reservadas a cada atividade. O modelo não desconta férias, licenças, feriados ou mudanças de rotina e não estima dados individuais sem que sejam informados.
+
+**Leitura cartográfica:** a faixa de sono aparece na extremidade direita de **todos os 80 anos** como comparação da fração do dia usada para dormir, inclusive nos anos futuros; portanto não significa sono já transcorrido. O polígono de trabalho mostra apenas os anos de trabalho **já transcorridos** no intervalo selecionado. A posição horizontal dessas áreas é uma abstração didática: não identifica semanas concretas em que alguém dormiu ou trabalhou. O progresso verde do calendário continua sendo o indicador das semanas transcorridas.
 
 ## Execução local
 
