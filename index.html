@@ -82,11 +82,24 @@
           <span><i class="legend-cell legend-lived"></i> Semana vivida</span>
           <span><i class="legend-cell legend-now"></i> Semana atual</span>
           <span><i class="legend-cell legend-future"></i> Semana futura</span>
+          <span><i class="legend-cell legend-sleep"></i> Faixa do sono</span>
+          <span><i class="legend-cell legend-work"></i> Área do trabalho</span>
         </div>
+        <p class="grid-instruction"><icon aria-hidden="true">✦</icon> Toque em um quadradinho para consultar a semana, idade e datas.</p>
         <div class="grid-axis-top"><span>IDADE</span><span>52 SEMANAS POR ANO <span aria-hidden="true">→</span></span></div>
-        <div id="life-calendar" class="life-calendar" role="img" aria-label="Calendário de 80 anos com 52 quadrados por linha, indicando semanas vividas, atual e futuras."></div>
+        <div id="calendar-visual" class="calendar-visual">
+          <div id="life-calendar" class="life-calendar" role="group" aria-label="Calendário interativo de 80 anos com 52 quadradinhos por linha. Use as setas do teclado para navegar entre semanas."></div>
+          <svg id="time-overlays" class="calendar-overlays" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"></svg>
+        </div>
         <div class="grid-axis-bottom"><span>0 ANOS</span><span>40 ANOS</span><span>80 ANOS</span></div>
-        <p class="calendar-caption">Cada linha começa em um aniversário. Para manter 52 quadrados por ano, as semanas são uma representação proporcional do respectivo ano de vida.</p>
+        <p class="calendar-caption">Cada linha começa em um aniversário. Para manter 52 quadrados por ano, as semanas são uma representação proporcional do respectivo ano de vida. As faixas de sono e trabalho indicam <strong>semanas equivalentes</strong>, não semanas literais dedicadas exclusivamente a essas atividades.</p>
+        <aside id="week-details" class="week-details" hidden aria-live="polite" aria-label="Detalhes da semana selecionada">
+          <div class="week-details-top"><span id="week-details-status" class="week-details-status">SEMANA VIVIDA</span><button id="week-details-close" class="week-details-close" type="button" aria-label="Fechar detalhes da semana">×</button></div>
+          <strong id="week-details-number" class="week-details-number">Semana 1</strong>
+          <p id="week-details-age" class="week-details-age">0 anos e 0 meses</p>
+          <small id="week-details-date" class="week-details-date"></small>
+          <small id="week-details-position" class="week-details-position"></small>
+        </aside>
       </div>
     </section>
 
@@ -123,7 +136,7 @@
         <span class="estimate-label">SIMULAÇÕES AJUSTÁVEIS</span>
       </div>
       <div class="allocation-grid">
-        <article class="allocation-card allocation-sleep">
+        <article id="sleep-card" class="allocation-card allocation-sleep">
           <div class="allocation-header"><span class="allocation-icon" aria-hidden="true">☾</span><span>DESCANSO</span></div>
           <strong id="stat-sleep" class="allocation-number">520 <em>semanas</em></strong>
           <p>Tempo estimado dormindo desde o nascimento.</p>
@@ -132,7 +145,7 @@
             <input type="range" id="sleep-hours" min="4" max="12" step="0.5" value="8">
           </div>
         </article>
-        <article class="allocation-card allocation-work">
+        <article id="work-card" class="allocation-card allocation-work">
           <div class="allocation-header"><span class="allocation-icon" aria-hidden="true">⌁</span><span>TRABALHO</span></div>
           <strong id="stat-work" class="allocation-number">149 <em>semanas</em></strong>
           <p>Tempo estimado de trabalho remunerado no período configurado.</p>
