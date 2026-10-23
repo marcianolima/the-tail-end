@@ -20,6 +20,7 @@
   const refs = {
     form: document.getElementById("birth-form"),
     birth: document.getElementById("birthdate"),
+    openBirthdate: document.getElementById("open-birthdate"),
     reset: document.getElementById("reset-demo"),
     help: document.getElementById("birth-help"),
     grid: document.getElementById("life-calendar"),
@@ -497,6 +498,27 @@
       setBirthFromInput();
     });
 
+    // Open the native date picker when tapping any part of the date field,
+    // not just the small browser-provided calendar indicator.
+    function openBirthdatePicker(fromButton) {
+      if (typeof refs.birth.showPicker === "function") {
+        try {
+          refs.birth.showPicker();
+          return;
+        } catch (_) {
+          // Older browsers or restricted contexts may not permit showPicker().
+        }
+      }
+      refs.birth.focus();
+      if (fromButton) refs.birth.click();
+    }
+
+    refs.birth.addEventListener("click", function () {
+      openBirthdatePicker(false);
+    });
+    refs.openBirthdate.addEventListener("click", function () {
+      openBirthdatePicker(true);
+    });
     refs.birth.addEventListener("change", setBirthFromInput);
     refs.birth.addEventListener("input", function () {
       refs.birth.setCustomValidity("");
