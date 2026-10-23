@@ -75,8 +75,32 @@ h1 span { color: var(--green); }
 .birth-copy label { display: block; font-weight: 770; font-size: .92rem; margin-bottom: 5px; }
 .birth-copy p, .form-footnote { margin: 0; font-size: .73rem; line-height: 1.5; color: #869ba8; }
 .birth-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
-.birth-actions input { min-width: 0; flex: 1 1 180px; max-width: 320px; padding: 12px 13px; min-height: 48px; color: #e8fff5; background: #07121a; border: 1px solid #386459; border-radius: 7px; color-scheme: dark; }
-.birth-actions input::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(.9); }
+.birthdate-control { position: relative; min-width: 0; flex: 1 1 180px; max-width: 320px; }
+.birthdate-control input {
+  width: 100%; min-width: 0; min-height: 50px; padding: 12px 55px 12px 13px;
+  font-size: 16px; font-weight: 620; color: #e8fff5; color-scheme: dark;
+  background: #07121a; border: 1px solid #386459; border-radius: 7px;
+  cursor: pointer; touch-action: manipulation;
+}
+.birthdate-control:focus-within input { border-color: var(--green); box-shadow: 0 0 0 2px #00e3a025; }
+.birthdate-control input::-webkit-calendar-picker-indicator { opacity: 0; cursor: pointer; }
+.birthdate-open {
+  position: absolute; z-index: 2; right: 5px; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px; display: grid; place-items: center; padding: 0;
+  border: 1px solid #286957; border-radius: 6px; background: #153b31;
+  color: #48f1b8; cursor: pointer; touch-action: manipulation;
+}
+.birthdate-open:hover, .birthdate-open:focus-visible {
+  background: #1d5444; color: #b2ffde; border-color: #46ca9d;
+}
+.birthdate-open svg { display: block; pointer-events: none; }
+@media (hover: none) and (pointer: coarse) {
+  /* On mobile, make the native calendar picker hit area cover the entire date input. */
+  .birthdate-control input::-webkit-calendar-picker-indicator {
+    position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
+    opacity: 0; cursor: pointer;
+  }
+}
 .subtle-button { flex: 0 0 auto; min-height: 48px; border: 1px solid #354c59; border-radius: 7px; background: #182630; color: #b4c8cf; font-weight: 700; cursor: pointer; padding: 0 15px; font-size: .78rem; }
 .subtle-button:hover { background: #223643; color: #fff; }
 .form-footnote { grid-column: 1 / -1; font-size: .68rem; }
@@ -193,7 +217,7 @@ h1 span { color: var(--green); }
   .section-head { flex-direction: row; align-items: flex-end; gap: 18px; margin-bottom: 28px; }
   .section-note { text-align: right; }
   .birth-form { grid-template-columns: 1fr auto; align-items: center; padding: 21px 25px; }
-  .birth-actions input { min-width: 190px; }
+  .birthdate-control { min-width: 190px; }
   .calendar-card { padding: 30px 35px 30px; }
   .calendar-year { grid-template-columns: 38px minmax(0,1fr); gap: 13px; margin-bottom: 2px; }
   .grid-axis-bottom { padding-left: 51px; }
