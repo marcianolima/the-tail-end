@@ -57,7 +57,16 @@
           <p>Preencha para iluminar as semanas que você já viveu.</p>
         </div>
         <div class="birth-actions">
-          <input id="birthdate" name="birthdate" type="date" autocomplete="bday" aria-describedby="birth-help" required>
+          <div class="birthdate-control">
+            <input id="birthdate" name="birthdate" type="date" autocomplete="bday" aria-describedby="birth-help" required>
+            <button id="open-birthdate" class="birthdate-open" type="button" aria-label="Abrir calendário para escolher a data de nascimento" title="Escolher data de nascimento">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+                <path d="M7 3v4M17 3v4M3 10h18"></path>
+                <path d="m9 15 2 2 4-4"></path>
+              </svg>
+            </button>
+          </div>
           <button id="reset-demo" type="button" class="subtle-button">Ver exemplo</button>
         </div>
         <p id="birth-help" class="form-footnote">Sua data fica somente neste navegador. Não há cadastro nem envio para servidores.</p>
